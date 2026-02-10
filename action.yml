@@ -1,0 +1,34 @@
+name: "Git Mirror"
+description: "Copy commits, branches and tags to another repository. Lightweight, no dependencies, works with ubuntu-slim."
+branding:
+  icon: "cloud"
+  color: "white"
+inputs:
+  target:
+    description: "Target remote repository url"
+    required: true
+  username:
+    description: "Username for https or ssh connection"
+    required: false
+    default: "git"
+  password:
+    description: "A password for https or SSH private key for ssh connection to the target repository"
+    required: false
+  dry:
+    description: "Execute a dry run"
+    required: false
+    default: false
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        args="--mirror"
+
+        [ "${{ inputs.dry }}" = "true" ] && args+=" --dry-run"
+
+        ${{ github.action_path }}/git-mirror.sh \
+          "${{ inputs.target }}" \
+          "${{ inputs.username }}" \
+          "${{ inputs.password }}" \
+          "$args"
