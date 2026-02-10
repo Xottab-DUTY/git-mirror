@@ -1,0 +1,53 @@
+name: "Mirror To"
+description: "Copy all branches with all commits, tags and more to another git repository. Lightweight, highly configurable."
+branding:
+  icon: "cloud"
+  color: "white"
+inputs:
+  target:
+    description: "HTTPS or SSH URL to the target remote repository to mirror everything to.
+                  Can contain the username and/or password."
+    required: true
+  username:
+    description: "Username for the target repository.
+                  Replaces the username specified in the URL."
+    required: false
+  password:
+    description: "An access token, HTTPS password or SSH private key for the target repository.
+                  Replaces the password specified in the URL."
+    required: false
+  passphrase:
+    description: "The passphrase for the supplied private SSH key."
+    required: false
+  known_hosts:
+    description: "Known hosts to be passed to ssh."
+    required: false
+  push_args:
+    description: "The push arguments to be used for mirroring."
+    default: "--mirror"
+    required: false
+  refspec:
+    description: "Custom refspec to use for mirroring."
+    required: false
+  dry:
+    description: "Convenience option to test things before doing real pushes.
+                  Adds --dry-run to the push_args."
+    required: false
+    default: false
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        args="${{ inputs.push_args }}"
+
+        [ "${{ inputs.dry }}" = "true" ] && args+=" --dry-run"
+
+        ${{ github.action_path }}/git-mirror.sh \
+          "${{ inputs.target }}" \
+          "${{ inputs.username }}" \
+          "${{ inputs.password }}" \
+          "${{ inputs.passphrase }}" \
+          "$args" \
+          "${{ inputs.refspec }}" \
+          "${{ inputs.known_hosts }}"
